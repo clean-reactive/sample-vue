@@ -18,9 +18,12 @@
     "deps:graph": "depcruise --config ./dependency-cruiser.config.cjs ./src --include-only '^src' --exclude '(.factory|test(s?)|spec(s?)|types|utils)' --collapse 5  --output-type dot | dot -T svg > ./dependency-graph.svg"
   },
   "dependencies": {
+    "@tanstack/vue-query": "^5.104.5",
+    "factory-t": "^2.0.0",
     "vue": "^3.5.42"
   },
   "devDependencies": {
+    "@esfx/async-deferred": "^1.0.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tsconfig/node24": "^24.0.5",
     "@types/jsdom": "^30.0.0",
