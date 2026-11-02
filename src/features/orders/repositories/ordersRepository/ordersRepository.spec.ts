@@ -10,7 +10,7 @@ import {
 } from './ordersRepository'
 import { makeOrdersService } from './OrdersService'
 import { makeOrdersServiceMock, type MockedOrdersService } from './utils/testing'
-import { itemEntityFactory, orderEntityFactory } from './ordersRepository.factories'
+import { makeOrderEntities, resetOrderEntitiesFactories } from '../../utils/testing'
 import type { OrderEntity } from './ordersRepository.types'
 import { useOrdersPresentationStore } from '../../stores'
 
@@ -48,10 +48,9 @@ describe('ordersRepository', () => {
   const ordersServiceMock = makeOrdersServiceMock()
 
   beforeEach<LocalTestContext>(async (context) => {
-    orderEntityFactory.resetCount()
-    itemEntityFactory.resetCount()
+    resetOrderEntitiesFactories()
     context.gatewayMock = ordersServiceMock.mock
-    context.orderEntities = orderEntityFactory.list({ count: 3 })
+    context.orderEntities = makeOrderEntities(3, 2)
     context.gatewayMock.getOrders.mockResolvedValue(context.orderEntities)
     ;[context.repository, context.wrapper] = withSetup(useRepository)
     await flushPromises()
@@ -70,7 +69,7 @@ describe('ordersRepository', () => {
     })
 
     it<LocalTestContext>('refetches orders when the resource changes', async (context) => {
-      const remoteOrders = orderEntityFactory.list({ count: 1 })
+      const remoteOrders = makeOrderEntities(1)
       context.gatewayMock.getOrders.mockResolvedValue(remoteOrders)
 
       useOrdersPresentationStore().setOrdersResource('remote')
