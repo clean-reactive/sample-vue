@@ -1,15 +1,40 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useMutationState } from '@tanstack/vue-query'
 import type { OrderItemParams } from './OrderItem.types'
 import { deleteItemButtonTestId, orderItemTestId } from '../../testIds'
+import {
+  deleteOrderItemMutationKey,
+  type ItemEntityId,
+  type OrderEntityId,
+} from '../../repositories'
+import { useIsDeleteOrderMutatingSelector, useOrderByIdSelector } from '../../composables'
 
-defineProps<OrderItemParams>()
+const props = defineProps<OrderItemParams>()
+
+const order = useOrderByIdSelector(() => props.orderId)
+const isDeleteOrderInProgress = useIsDeleteOrderMutatingSelector(() => props.orderId)
+const pendingDeleteItems = useMutationState({
+  filters: { mutationKey: deleteOrderItemMutationKey, status: 'pending' },
+  select: (mutation) =>
+    mutation.state.variables as { orderId: OrderEntityId; itemId: ItemEntityId },
+})
 
 // presenter
-const hasItem: boolean = true
-const itemId: string = '1'
-const productId: string = '17'
-const quantity: number = 3
-const isDeleteItemButtonDisabled: boolean = false
+const item = computed(() =>
+  order.value?.itemEntities.find((itemEntity) => itemEntity.id === props.itemId),
+)
+const hasItem = computed(() => item.value !== undefined)
+const itemId = computed(() => item.value?.id ?? '')
+const productId = computed(() => item.value?.productId ?? '')
+const quantity = computed(() => item.value?.quantity ?? 0)
+const isDeleteItemButtonDisabled = computed(
+  () =>
+    isDeleteOrderInProgress.value ||
+    pendingDeleteItems.value.some(
+      (variables) => variables.orderId === props.orderId && variables.itemId === props.itemId,
+    ),
+)
 
 // controller
 const deleteOrderItemButtonClicked: () => void = () => {}

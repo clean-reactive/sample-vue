@@ -1,11 +1,23 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { totalItemQuantityTestId } from '../testIds'
+import { useOrdersSelector } from '../composables'
+
+const orders = useOrdersSelector()
 
 // presenter
-const uniqueUsersCount: number = 1
-const ordersCount: number = 3
-const itemLinesCount: number = 6
-const totalItemsQuantity: number = 18
+const uniqueUsersCount = computed(() => new Set(orders.value.map((order) => order.userId)).size)
+const ordersCount = computed(() => orders.value.length)
+const itemLinesCount = computed(() =>
+  orders.value.reduce((count, order) => count + order.itemEntities.length, 0),
+)
+const totalItemsQuantity = computed(() =>
+  orders.value.reduce(
+    (total, order) =>
+      total + order.itemEntities.reduce((subtotal, item) => subtotal + item.quantity, 0),
+    0,
+  ),
+)
 </script>
 
 <template>

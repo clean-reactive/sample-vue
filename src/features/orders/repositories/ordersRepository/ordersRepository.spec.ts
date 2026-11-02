@@ -1,7 +1,5 @@
 import { describe, it, beforeEach, afterEach, expect, vi, assert } from 'vitest'
-import { defineComponent } from 'vue'
-import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
-import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query'
+import { flushPromises, type VueWrapper } from '@vue/test-utils'
 import { Deferred } from '@esfx/async-deferred'
 import {
   useDeleteOrderItemMutation,
@@ -11,6 +9,7 @@ import {
 import { makeOrdersService } from './OrdersService'
 import { makeOrdersServiceMock, type MockedOrdersService } from './utils/testing'
 import { makeOrderEntities, resetOrderEntitiesFactories } from '../../utils/testing'
+import { withSetup } from '../../utils/testing/withSetup'
 import type { OrderEntity } from './ordersRepository.types'
 import { useOrdersPresentationStore } from '../../stores'
 
@@ -21,21 +20,6 @@ const useRepository = () => ({
   deleteOrder: useDeleteOrderMutation(),
   deleteOrderItem: useDeleteOrderItemMutation(),
 })
-
-function withSetup<T>(composable: () => T) {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  let result!: T
-  const wrapper = mount(
-    defineComponent({
-      setup() {
-        result = composable()
-        return () => null
-      },
-    }),
-    { global: { plugins: [[VueQueryPlugin, { queryClient }]] } },
-  )
-  return [result, wrapper] as const
-}
 
 interface LocalTestContext {
   gatewayMock: MockedOrdersService
