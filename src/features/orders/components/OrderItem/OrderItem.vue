@@ -5,6 +5,8 @@ import type { OrderItemParams } from './OrderItem.types'
 import { deleteItemButtonTestId, orderItemTestId } from '../../testIds'
 import {
   deleteOrderItemMutationKey,
+  useDeleteOrderItemMutation,
+  useDeleteOrderMutation,
   type ItemEntityId,
   type OrderEntityId,
 } from '../../repositories'
@@ -14,6 +16,8 @@ const props = defineProps<OrderItemParams>()
 
 const order = useOrderByIdSelector(() => props.orderId)
 const isDeleteOrderInProgress = useIsDeleteOrderMutatingSelector(() => props.orderId)
+const { mutateAsync: deleteOrder } = useDeleteOrderMutation()
+const { mutateAsync: deleteItem } = useDeleteOrderItemMutation()
 const pendingDeleteItems = useMutationState({
   filters: { mutationKey: deleteOrderItemMutationKey, status: 'pending' },
   select: (mutation) =>
@@ -36,8 +40,18 @@ const isDeleteItemButtonDisabled = computed(
     ),
 )
 
-// controller
-const deleteOrderItemButtonClicked: () => void = () => {}
+// controller with an inline use case; decisions read entities, not display values
+const deleteOrderItemButtonClicked = async () => {
+  try {
+    if (order.value?.itemEntities.length === 1) {
+      await deleteOrder({ orderId: props.orderId })
+    } else {
+      await deleteItem({ orderId: props.orderId, itemId: props.itemId })
+    }
+  } catch (error: unknown) {
+    console.error(error)
+  }
+}
 </script>
 
 <template>

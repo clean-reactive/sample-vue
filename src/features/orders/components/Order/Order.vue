@@ -2,7 +2,7 @@
 import type { OrderParams } from './Order.types'
 import { OrderItem } from '../OrderItem'
 import { deleteOrderButtonTestId, orderTestId } from '../../testIds'
-import { usePresenter } from './composables'
+import { useController, usePresenter } from './composables'
 
 const props = defineProps<OrderParams>()
 
@@ -10,7 +10,7 @@ const props = defineProps<OrderParams>()
 const presenter = usePresenter(props)
 
 // controller
-const deleteOrderButtonClicked: () => void = () => {}
+const controller = useController(props)
 </script>
 
 <template>
@@ -29,7 +29,7 @@ const deleteOrderButtonClicked: () => void = () => {}
           class="btn btn-sm btn-error btn-outline shrink-0"
           :data-testid="deleteOrderButtonTestId"
           :disabled="presenter.isDeleteOrderButtonDisabled"
-          @click="deleteOrderButtonClicked"
+          @click="controller.deleteOrderButtonClicked"
         >
           Delete Order
         </button>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useOrdersPresentationStore } from '../stores'
+import { isOrdersResource } from '../utils'
 
 const store = useOrdersPresentationStore()
 
@@ -9,7 +10,13 @@ const isLocalChecked = computed(() => store.ordersResource === 'local')
 const isRemoteChecked = computed(() => store.ordersResource === 'remote')
 
 // controller
-const radioInputChanged: (event: Event) => void = () => {}
+const radioInputChanged = (event: Event) => {
+  const value = (event.target as HTMLInputElement).value
+  if (!isOrdersResource(value)) {
+    return
+  }
+  store.setOrdersResource(value)
+}
 </script>
 
 <template>

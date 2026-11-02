@@ -16,3 +16,8 @@ export interface Presenter {
   summaryLabel: string
   isDeleteOrderButtonDisabled: boolean
 }
+
+/** User interactions emitted by Order's template. */
+export interface Controller {
+  deleteOrderButtonClicked: () => void
+}
